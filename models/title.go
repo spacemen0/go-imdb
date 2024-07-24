@@ -8,15 +8,16 @@ import (
 
 // Title represents the title table in the database
 type Title struct {
-	ID             string  `gorm:"primaryKey;column:tconst"`
-	TitleType      string  `gorm:"column:titleType"`
-	PrimaryTitle   string  `gorm:"column:primaryTitle"`
-	OriginalTitle  string  `gorm:"column:originalTitle"`
-	IsAdult        bool    `gorm:"column:isAdult"`
-	StartYear      *int    `gorm:"column:startYear"`
-	EndYear        *int    `gorm:"column:endYear"`
-	RuntimeMinutes *int    `gorm:"column:runTimeMinutes"`
-	Genres         *string `gorm:"type:text[];column:genres"`
+	ID             string `gorm:"primaryKey;column:tconst"`
+	TitleType      string
+	PrimaryTitle   string
+	OriginalTitle  string
+	IsAdult        bool
+	StartYear      *int
+	EndYear        *int
+	RuntimeMinutes *int
+	Genres         *string
+	Actors         []*Person `gorm:"many2many:filmography;"`
 }
 
 // CreateTitle creates a new title record in the database

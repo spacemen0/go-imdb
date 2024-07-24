@@ -8,12 +8,12 @@ import (
 
 // Person represents the person table in the database
 type Person struct {
-	ID                string  `gorm:"primaryKey;column:nconst"`
-	PrimaryName       string  `gorm:"column:primaryName"`
-	BirthYear         *int    `gorm:"column:birthYear"`
-	DeathYear         *int    `gorm:"column:deathYear"`
-	PrimaryProfession *string `gorm:"type:text[];column:primaryProfession"`
-	KnownForTitles    *string `gorm:"type:text[];column:knownForTitles"`
+	ID                string `gorm:"primaryKey;column:nconst"`
+	PrimaryName       string
+	BirthYear         *int
+	DeathYear         *int
+	PrimaryProfession *string  `gorm:"type:text[];"`
+	KnownForTitles    []*Title `gorm:"many2many:filmography;"`
 }
 
 // CreatePerson creates a new person record in the database
