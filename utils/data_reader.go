@@ -37,14 +37,17 @@ type Title struct {
 func main() {
 	helpers.InitDB()
 	db := helpers.GetDB()
-
-	err := readPersons("person.tsv", db)
+	err := readTitles("title.tsv", db)
 	if err != nil {
-		log.Fatalf("failed to read persons: %v", err)
+		log.Fatalf("failed to read titles: %v", err)
+	}
+	err = readPeople("person.tsv", db)
+	if err != nil {
+		log.Fatalf("failed to read people: %v", err)
 	}
 }
 
-func readPersons(filename string, db *gorm.DB) error {
+func readPeople(filename string, db *gorm.DB) error {
 	file, err := os.Open(filename)
 	if err != nil {
 		return err
@@ -109,7 +112,12 @@ func readTitles(filename string, db *gorm.DB) error {
 	if err != nil {
 		return err
 	}
-	defer file.Close()
+	defer func(file *os.File) {
+		err := file.Close()
+		if err != nil {
+			fmt.Println(err)
+		}
+	}(file)
 
 	scanner := bufio.NewScanner(file)
 	scanner.Scan() // Skip header line
