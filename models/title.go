@@ -28,7 +28,9 @@ func CreateTitle(db *gorm.DB, title *Title) error {
 // GetTitle retrieves a title record by its ID
 func GetTitle(db *gorm.DB, id string) (*Title, error) {
 	var title Title
-	if err := db.First(&title, "tconst = ?", id).Error; err != nil {
+	if err := db.Preload("Actors", func(db *gorm.DB) *gorm.DB {
+		return db.Select("nconst")
+	}).First(&title, "tconst = ?", id).Error; err != nil {
 		return nil, err
 	}
 	return &title, nil

@@ -24,7 +24,9 @@ func CreatePerson(db *gorm.DB, person *Person) error {
 // GetPerson retrieves a person record by its ID
 func GetPerson(db *gorm.DB, id string) (*Person, error) {
 	var person Person
-	if err := db.First(&person, "nconst = ?", id).Error; err != nil {
+	if err := db.Preload("KnownForTitles", func(db *gorm.DB) *gorm.DB {
+		return db.Select("tconst")
+	}).First(&person, "nconst = ?", id).Error; err != nil {
 		return nil, err
 	}
 	return &person, nil
