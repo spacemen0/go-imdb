@@ -5,6 +5,7 @@ import (
 	"log"
 	"spacemen0.github.com/controllers"
 	"spacemen0.github.com/helpers"
+	"spacemen0.github.com/middlewares"
 )
 
 func main() {
@@ -13,7 +14,7 @@ func main() {
 	gin.SetMode(gin.ReleaseMode)
 	// Set up the Gin router
 	router := gin.Default()
-
+	router.Use(middlewares.OmitEmptyFieldsInPreloadedDataMiddleware())
 	// Define the API version group
 	v1 := router.Group("/api/v1")
 
