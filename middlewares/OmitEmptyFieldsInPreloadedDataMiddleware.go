@@ -38,7 +38,7 @@ func OmitEmptyFieldsInPreloadedDataMiddleware() gin.HandlerFunc {
 				data["Actors"] = actors
 			}
 			// Encode the JSON back
-			newBody, err := json.MarshalIndent(data, "", "    ")
+			newBody, err := json.Marshal(data)
 			if err != nil {
 				c.Writer.WriteHeader(http.StatusInternalServerError)
 				_, _ = c.Writer.Write([]byte(`{"error": "Failed to process response"}`))
