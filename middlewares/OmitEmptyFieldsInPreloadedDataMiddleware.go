@@ -12,6 +12,11 @@ import (
 // OmitEmptyFieldsInPreloadedDataMiddleware processes JSON responses to omit empty fields in specific fields
 func OmitEmptyFieldsInPreloadedDataMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
+		if c.DefaultQuery("verbose", "false") == "true" {
+			// If verbose is true, do nothing and continue with the request
+			c.Next()
+			return
+		}
 		// Capture the response
 		w := &responseWriter{body: &bytes.Buffer{}, ResponseWriter: c.Writer}
 		c.Writer = w

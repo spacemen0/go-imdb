@@ -8,12 +8,12 @@ import (
 
 // Person represents the person table in the database
 type Person struct {
-	ID                string `gorm:"primaryKey;column:nconst"`
-	PrimaryName       string
-	BirthYear         *int
-	DeathYear         *int
-	PrimaryProfession *string  `gorm:"type:text[];"`
-	KnownForTitles    []*Title `gorm:"many2many:filmography;"`
+	ID                string   `gorm:"primaryKey;column:nconst;" json:"nConst"`
+	PrimaryName       string   `json:"primaryName"`
+	BirthYear         *int     `json:"birthYear"`
+	DeathYear         *int     `json:"deathYear"`
+	PrimaryProfession *string  `gorm:"type:text[];" json:"primaryProfession"`
+	KnownForTitles    []*Title `gorm:"many2many:filmography;" json:"knownForTitles"`
 }
 
 // CreatePerson creates a new person record in the database
@@ -22,12 +22,19 @@ func CreatePerson(db *gorm.DB, person *Person) error {
 }
 
 // GetPerson retrieves a person record by its ID
-func GetPerson(db *gorm.DB, id string) (*Person, error) {
+func GetPerson(db *gorm.DB, id string, verbose bool) (*Person, error) {
 	var person Person
-	if err := db.Preload("KnownForTitles", func(db *gorm.DB) *gorm.DB {
-		return db.Select("tconst")
-	}).First(&person, "nconst = ?", id).Error; err != nil {
-		return nil, err
+	if verbose {
+		// If verbose is true, preload all associated data
+		if err := db.Preload("KnownForTitles").Preload("KnownForTitles.Actors").First(&person, "nconst = ?", id).Error; err != nil {
+			return nil, err
+		}
+	} else {
+		if err := db.Preload("KnownForTitles", func(db *gorm.DB) *gorm.DB {
+			return db.Select("tconst")
+		}).First(&person, "nconst = ?", id).Error; err != nil {
+			return nil, err
+		}
 	}
 	return &person, nil
 }

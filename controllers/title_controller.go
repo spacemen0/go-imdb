@@ -1,6 +1,8 @@
 package controllers
 
 import (
+	"errors"
+	"gorm.io/gorm"
 	"net/http"
 
 	"spacemen0.github.com/helpers"
@@ -27,10 +29,22 @@ func CreateTitle(c *gin.Context) {
 // GetTitle handles GET /titles/:id
 func GetTitle(c *gin.Context) {
 	id := c.Param("id")
+	verbose := c.DefaultQuery("verbose", "false")
 	db := helpers.GetDB()
-	title, err := models.GetTitle(db, id)
+	var title *models.Title
+	var err error
+	if verbose == "true" {
+		title, err = models.GetTitle(db, id, true)
+	} else if verbose == "false" {
+		title, err = models.GetTitle(db, id, false)
+	}
+
 	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": "Title not found"})
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			c.JSON(http.StatusNotFound, gin.H{"error": "Title not found"})
+		} else {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve title"})
+		}
 		return
 	}
 	c.JSON(http.StatusOK, title)

@@ -1,6 +1,8 @@
 package controllers
 
 import (
+	"errors"
+	"gorm.io/gorm"
 	"net/http"
 
 	"spacemen0.github.com/helpers"
@@ -27,12 +29,28 @@ func CreatePerson(c *gin.Context) {
 // GetPerson handles GET /persons/:id
 func GetPerson(c *gin.Context) {
 	id := c.Param("id")
+	verbose := c.DefaultQuery("verbose", "false")
 	db := helpers.GetDB()
-	person, err := models.GetPerson(db, id)
+	var person *models.Person
+	var err error
+
+	if verbose == "true" {
+		// If verbose=true, preload all associated data
+		person, err = models.GetPerson(db, id, true)
+	} else {
+		// If verbose=false, only preload limited associations (e.g., IDs)
+		person, err = models.GetPerson(db, id, false)
+	}
+
 	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": "Person not found"})
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			c.JSON(http.StatusNotFound, gin.H{"error": "Person not found"})
+		} else {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve person"})
+		}
 		return
 	}
+
 	c.JSON(http.StatusOK, person)
 }
 
