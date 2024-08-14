@@ -15,7 +15,6 @@ def filter_bad_lines(input_file, output_file):
 
         print(f"Filtered file saved to {output_file}")
 
-    except Exception as e:
         print(f"Error processing the file: {e}")
 
 # Usage example

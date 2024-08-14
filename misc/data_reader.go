@@ -1,11 +1,10 @@
-package main
+package misc
 
 import (
 	"bufio"
 	"fmt"
 	"log"
 	"os"
-	"spacemen0.github.com/helpers"
 	"strconv"
 	"strings"
 
@@ -34,18 +33,18 @@ type Title struct {
 	Actors         []*Person `gorm:"many2many:filmography;"`
 }
 
-func main() {
-	helpers.InitDB()
-	db := helpers.GetDB()
-	err := readTitles("title.tsv", db)
-	if err != nil {
-		log.Fatalf("failed to read titles: %v", err)
-	}
-	err = readPeople("person.tsv", db)
-	if err != nil {
-		log.Fatalf("failed to read people: %v", err)
-	}
-}
+//func main() {
+//	helpers.InitDB()
+//	db := helpers.GetDB()
+//	err := readTitles("title.tsv", db)
+//	if err != nil {
+//		log.Fatalf("failed to read titles: %v", err)
+//	}
+//	err = readPeople("person.tsv", db)
+//	if err != nil {
+//		log.Fatalf("failed to read people: %v", err)
+//	}
+//}
 
 func readPeople(filename string, db *gorm.DB) error {
 	file, err := os.Open(filename)
