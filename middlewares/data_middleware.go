@@ -49,7 +49,6 @@ func DataMiddleware() gin.HandlerFunc {
 				_, _ = c.Writer.Write([]byte(`{"error": "Failed to process response"}`))
 				return
 			}
-
 			_, _ = w.ResponseWriter.WriteString(string(newBody))
 			w.Body.Reset()
 		}

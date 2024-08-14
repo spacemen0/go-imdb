@@ -2,7 +2,6 @@ package main
 
 import (
 	"github.com/gin-gonic/gin"
-	"log"
 	"spacemen0.github.com/controllers"
 	"spacemen0.github.com/helpers"
 	"spacemen0.github.com/middlewares"
@@ -10,13 +9,14 @@ import (
 
 func main() {
 	// Initialize the database
-	helpers.ReadEnv()
+	helpers.LoadEnv()
 	helpers.InitDB()
+	helpers.InitLogger()
 	gin.SetMode(gin.ReleaseMode)
 	// Set up the Gin router
 	router := gin.Default()
 	router.Use(middlewares.DataMiddleware())
-	//router.Use(middlewares.LoggerToFile("./server.log"))
+	router.Use(middlewares.LoggerToFile())
 	// Define the API version group
 	v1 := router.Group("/api/v1")
 
@@ -33,8 +33,8 @@ func main() {
 	v1.DELETE("/titles/:id", controllers.DeleteTitle)
 
 	// Start the server
-	log.Println("Starting server on :8080...")
+	helpers.Log.Println("Starting server on :8080...")
 	if err := router.Run(":8080"); err != nil {
-		log.Fatalf("Failed to start server: %v", err)
+		helpers.Log.Fatalf("Failed to start server: %v", err)
 	}
 }

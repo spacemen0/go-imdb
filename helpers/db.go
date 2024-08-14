@@ -2,7 +2,6 @@ package helpers
 
 import (
 	"fmt"
-	"log"
 	"os"
 
 	"gorm.io/driver/postgres"
@@ -24,13 +23,13 @@ func InitDB() {
 	var err error
 	db, err = gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
-		log.Fatal("Failed to connect to database:", err)
+		Log.Fatal("Failed to connect to database:", err)
 	}
 
 	// Migrate the schema
 	err = db.AutoMigrate(&models.Title{}, &models.Person{})
 	if err != nil {
-		log.Fatal("Failed to migrate database schema:", err)
+		Log.Fatal("Failed to migrate database schema:", err)
 	}
 }
 
