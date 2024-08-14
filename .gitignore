@@ -4,3 +4,4 @@ tmp
 misc
 *.log
 *.tsv
+.env

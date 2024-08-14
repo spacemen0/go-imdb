@@ -10,6 +10,7 @@ import (
 
 func main() {
 	// Initialize the database
+	helpers.ReadEnv()
 	helpers.InitDB()
 	gin.SetMode(gin.ReleaseMode)
 	// Set up the Gin router

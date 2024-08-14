@@ -34,13 +34,13 @@ func DataMiddleware() gin.HandlerFunc {
 			}
 
 			// Process specific fields
-			if knownForTitles, ok := data["KnownForTitles"].([]any); ok {
+			if knownForTitles, ok := data["knownForTitles"].([]any); ok {
 				processPreloadedData(knownForTitles)
-				data["KnownForTitles"] = knownForTitles
+				data["knownForTitles"] = knownForTitles
 			}
-			if actors, ok := data["Actors"].([]any); ok {
+			if actors, ok := data["actors"].([]any); ok {
 				processPreloadedData(actors)
-				data["Actors"] = actors
+				data["actors"] = actors
 			}
 			// Encode the JSON back
 			newBody, err := json.Marshal(data)
@@ -50,9 +50,6 @@ func DataMiddleware() gin.HandlerFunc {
 				return
 			}
 
-			// Write the final response to the original ResponseWriter
-			//c.Writer.Header().Set("Content-Length", fmt.Sprintf("%d", w.body.Len()))
-			//c.Writer.Header().Set("Content-Type", "application/json")
 			_, _ = w.ResponseWriter.WriteString(string(newBody))
 			w.Body.Reset()
 		}
