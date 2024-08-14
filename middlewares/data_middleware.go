@@ -1,16 +1,16 @@
 package middlewares
 
 import (
-	"bytes"
 	"encoding/json"
 	"net/http"
+	"spacemen0.github.com/utils"
 	"strings"
 
 	"github.com/gin-gonic/gin"
 )
 
-// OmitEmptyFieldsInPreloadedDataMiddleware processes JSON responses to omit empty fields in specific fields
-func OmitEmptyFieldsInPreloadedDataMiddleware() gin.HandlerFunc {
+// DataMiddleware processes JSON responses to omit empty fields in specific fields
+func DataMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		if c.DefaultQuery("verbose", "false") == "true" {
 			// If verbose is true, do nothing and continue with the request
@@ -18,7 +18,7 @@ func OmitEmptyFieldsInPreloadedDataMiddleware() gin.HandlerFunc {
 			return
 		}
 		// Capture the response
-		w := &responseWriter{body: &bytes.Buffer{}, ResponseWriter: c.Writer}
+		w := utils.NewResponseWriter(c.Writer)
 		c.Writer = w
 
 		c.Next() // Process the request
@@ -27,7 +27,7 @@ func OmitEmptyFieldsInPreloadedDataMiddleware() gin.HandlerFunc {
 		if strings.Contains(c.Writer.Header().Get("Content-Type"), "application/json") {
 			// Decode the JSON
 			var data map[string]any
-			if err := json.Unmarshal(w.body.Bytes(), &data); err != nil {
+			if err := json.Unmarshal(w.Body.Bytes(), &data); err != nil {
 				c.Writer.WriteHeader(http.StatusInternalServerError)
 				_, _ = c.Writer.Write([]byte(`{"error": "Failed to process response"}`))
 				return
@@ -54,7 +54,7 @@ func OmitEmptyFieldsInPreloadedDataMiddleware() gin.HandlerFunc {
 			//c.Writer.Header().Set("Content-Length", fmt.Sprintf("%d", w.body.Len()))
 			//c.Writer.Header().Set("Content-Type", "application/json")
 			_, _ = w.ResponseWriter.WriteString(string(newBody))
-			w.body.Reset()
+			w.Body.Reset()
 		}
 	}
 }
@@ -96,14 +96,4 @@ func removeEmptyFields(data map[string]interface{}) {
 			delete(data, key)
 		}
 	}
-}
-
-// responseWriter is a custom ResponseWriter that captures the response body
-type responseWriter struct {
-	gin.ResponseWriter
-	body *bytes.Buffer
-}
-
-func (w *responseWriter) Write(b []byte) (int, error) {
-	return w.body.Write(b)
 }
