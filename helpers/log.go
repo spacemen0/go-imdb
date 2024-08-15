@@ -15,5 +15,4 @@ func InitLogger() {
 	}
 	// Create a new logger that writes to the file
 	Log = log.New(f, "", log.Ldate|log.Ltime|log.Lshortfile)
-
 }

@@ -9,9 +9,9 @@ import (
 
 func main() {
 	// Initialize the database
+	helpers.InitLogger()
 	helpers.LoadEnv()
 	helpers.InitDB()
-	helpers.InitLogger()
 	gin.SetMode(gin.ReleaseMode)
 	// Set up the Gin router
 	router := gin.Default()
