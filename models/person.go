@@ -11,7 +11,7 @@ type Person struct {
 	BirthYear         *int     `json:"birthYear"`
 	DeathYear         *int     `json:"deathYear"`
 	PrimaryProfession *string  `gorm:"type:text[];" json:"primaryProfession"`
-	KnownForTitles    []*Title `gorm:"many2many:filmography;" json:"knownForTitles"`
+	KnownForTitles    []*Title `gorm:"many2many:filmography;constraint:OnDelete:CASCADE;" json:"knownForTitles"`
 }
 
 // CreatePerson creates a new person record in the database

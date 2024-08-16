@@ -15,7 +15,7 @@ type Title struct {
 	EndYear        *int      `json:"endYear"`
 	RuntimeMinutes *int      `json:"runtimeMinutes"`
 	Genres         *string   `json:"genres"`
-	Actors         []*Person `gorm:"many2many:filmography;" json:"actors"`
+	Actors         []*Person `gorm:"many2many:filmography;constraint:OnDelete:CASCADE;" json:"actors"`
 }
 
 // CreateTitle creates a new title record in the database
