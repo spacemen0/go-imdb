@@ -15,14 +15,16 @@ import (
 func CreatePerson(c *gin.Context) {
 	var person models.Person
 	if err := c.ShouldBindJSON(&person); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid JSON data", "details": err.Error()})
 		return
 	}
+
 	db := helpers.GetDB()
 	if err := models.CreatePerson(db, &person); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create person", "details": err.Error()})
 		return
 	}
+
 	c.JSON(http.StatusCreated, person)
 }
 
@@ -35,10 +37,8 @@ func GetPerson(c *gin.Context) {
 	var err error
 
 	if verbose == "true" {
-		// If verbose=true, preload all associated data
 		person, err = models.GetPerson(db, id, true)
 	} else {
-		// If verbose=false, only preload limited associations (e.g., IDs)
 		person, err = models.GetPerson(db, id, false)
 	}
 
@@ -46,7 +46,7 @@ func GetPerson(c *gin.Context) {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			c.JSON(http.StatusNotFound, gin.H{"error": "Person not found"})
 		} else {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve person"})
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve person", "details": err.Error()})
 		}
 		return
 	}
@@ -59,15 +59,21 @@ func UpdatePerson(c *gin.Context) {
 	id := c.Param("id")
 	var person models.Person
 	if err := c.ShouldBindJSON(&person); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid JSON data", "details": err.Error()})
 		return
 	}
+
 	person.ID = id
 	db := helpers.GetDB()
 	if err := models.UpdatePerson(db, &person); err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": "Person not found"})
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			c.JSON(http.StatusNotFound, gin.H{"error": "Person not found"})
+		} else {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update person", "details": err.Error()})
+		}
 		return
 	}
+
 	c.JSON(http.StatusOK, person)
 }
 
@@ -76,8 +82,13 @@ func DeletePerson(c *gin.Context) {
 	id := c.Param("id")
 	db := helpers.GetDB()
 	if err := models.DeletePerson(db, id); err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": "Person not found"})
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			c.JSON(http.StatusNotFound, gin.H{"error": "Person not found"})
+		} else {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete person", "details": err.Error()})
+		}
 		return
 	}
+
 	c.JSON(http.StatusNoContent, nil)
 }

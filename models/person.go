@@ -1,8 +1,6 @@
 package models
 
 import (
-	"errors"
-
 	"gorm.io/gorm"
 )
 
@@ -41,16 +39,16 @@ func GetPerson(db *gorm.DB, id string, verbose bool) (*Person, error) {
 
 // UpdatePerson updates an existing person record in the database
 func UpdatePerson(db *gorm.DB, person *Person) error {
-	if db.Model(&Person{}).Where("nconst = ?", person.ID).Updates(person).RowsAffected == 0 {
-		return errors.New("record not found")
+	if err := db.Model(&Person{}).Where("nconst = ?", person.ID).Updates(person).Error; err != nil {
+		return err
 	}
 	return nil
 }
 
 // DeletePerson deletes a person record by its ID
 func DeletePerson(db *gorm.DB, id string) error {
-	if db.Delete(&Person{}, "nconst = ?", id).RowsAffected == 0 {
-		return errors.New("record not found")
+	if err := db.Delete(&Person{}, "nconst = ?", id).Error; err != nil {
+		return err
 	}
 	return nil
 }
