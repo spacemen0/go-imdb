@@ -1,8 +1,6 @@
 package models
 
 import (
-	"errors"
-
 	"gorm.io/gorm"
 )
 
@@ -45,16 +43,16 @@ func GetTitle(db *gorm.DB, id string, verbose bool) (*Title, error) {
 
 // UpdateTitle updates an existing title record in the database
 func UpdateTitle(db *gorm.DB, title *Title) error {
-	if db.Model(&Title{}).Where("tconst = ?", title.ID).Updates(title).RowsAffected == 0 {
-		return errors.New("record not found")
+	if err := db.Model(&Title{}).Where("tconst = ?", title.ID).Updates(title).Error; err != nil {
+		return err
 	}
 	return nil
 }
 
 // DeleteTitle deletes a title record by its ID
 func DeleteTitle(db *gorm.DB, id string) error {
-	if db.Delete(&Title{}, "tconst = ?", id).RowsAffected == 0 {
-		return errors.New("record not found")
+	if err := db.Delete(&Title{}, "tconst = ?", id).Error; err != nil {
+		return err
 	}
 	return nil
 }
