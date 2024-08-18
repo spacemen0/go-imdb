@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"spacemen0.github.com/controllers"
 	"spacemen0.github.com/helpers"
@@ -16,18 +17,21 @@ func main() {
 	// Set up the Gin router
 	router := gin.Default()
 	router.HandleMethodNotAllowed = true
-	router.Use(middlewares.DataMiddleware())
+	router.Use(cors.Default())
+
 	router.Use(middlewares.LoggerMiddleware())
 	// Define the API version group
 	v1 := router.Group("/api/v1")
 
+	v1.GET("/search", controllers.Search)
+	router.Use(middlewares.DataMiddleware())
 	// Define routes for Person
 	v1.POST("/people", controllers.CreatePerson)
 	v1.GET("/people/:id", controllers.GetPerson)
 	v1.PUT("/people/:id", controllers.UpdatePerson)
 	v1.DELETE("/people/:id", controllers.DeletePerson)
 
-	// Define routes for Title if needed
+	// Define routes for Title
 	v1.POST("/titles", controllers.CreateTitle)
 	v1.GET("/titles/:id", controllers.GetTitle)
 	v1.PUT("/titles/:id", controllers.UpdateTitle)

@@ -31,8 +31,18 @@ func InitDB() {
 	if err != nil {
 		Log.Fatal("Failed to migrate database schema:", err)
 	}
+	fullTextMigrations()
 }
 
 func GetDB() *gorm.DB {
 	return db
+}
+
+func fullTextMigrations() {
+	if err := db.Exec("CREATE INDEX IF NOT EXISTS idx_person_name ON people USING gin(to_tsvector('english', primary_name))").Error; err != nil {
+		Log.Fatal("Failed to create index on people:", err)
+	}
+	if err := db.Exec("CREATE INDEX IF NOT EXISTS idx_title_text ON titles USING gin(to_tsvector('english', primary_title || ' ' || original_title))").Error; err != nil {
+		Log.Fatal("Failed to create index on titles:", err)
+	}
 }
