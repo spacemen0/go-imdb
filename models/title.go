@@ -50,6 +50,9 @@ func UpdateTitle(db *gorm.DB, title *Title) error {
 	if err := db.Model(&Title{}).Where("tconst = ?", title.ID).Updates(title).Error; err != nil {
 		return err
 	}
+	if err := db.Model(title).Association("Actors").Replace(title.Actors); err != nil {
+		return err
+	}
 	return nil
 }
 

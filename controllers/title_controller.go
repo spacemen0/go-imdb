@@ -18,13 +18,11 @@ func CreateTitle(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid JSON data", "details": err.Error()})
 		return
 	}
-
 	db := helpers.GetDB()
 	if err := models.CreateTitle(db, &title); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create title", "details": err.Error()})
 		return
 	}
-
 	c.JSON(http.StatusCreated, title)
 }
 
