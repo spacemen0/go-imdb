@@ -11,8 +11,8 @@ import (
 	"spacemen0.github.com/utils" // Update this import path
 )
 
-// LoggerToFile logs request and response details to a file
-func LoggerToFile() gin.HandlerFunc {
+// LoggerMiddleware logs request and response details to a file
+func LoggerMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		// Create a buffer to capture the response body
 		w := utils.NewResponseWriter(c.Writer)
@@ -34,16 +34,21 @@ func LoggerToFile() gin.HandlerFunc {
 		// Proceed with the request
 		c.Next()
 		_, _ = w.ResponseWriter.Write(w.Body.Bytes())
+		responseHeaders := ""
+		for key, values := range w.Header() {
+			responseHeaders += fmt.Sprintf("%s: %v\n", key, values)
+		}
 		// Log response details
 		duration := time.Since(startTime)
 		logEntry := fmt.Sprintf(
-			"\nMethod: %s\nURL: %s\nHeaders: %v\nRequest Body: %s\nResponse Status: %d\nResponse Body: %s\nDuration: %v\n\n",
+			"\nMethod: %s\nURL: %s\nHeaders: %v\nRequest Body: %s\nResponse Status: %d\nResponse Body: %s\nResponse Header: %sDuration: %v\n\n",
 			c.Request.Method,
 			c.Request.URL.Path,
 			c.Request.Header,
 			string(requestBody),
 			c.Writer.Status(),
 			string(w.Body.Bytes()),
+			responseHeaders,
 			duration,
 		)
 		helpers.Log.Println(logEntry)

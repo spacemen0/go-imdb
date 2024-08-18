@@ -15,8 +15,9 @@ func main() {
 	gin.SetMode(gin.ReleaseMode)
 	// Set up the Gin router
 	router := gin.Default()
+	router.HandleMethodNotAllowed = true
 	router.Use(middlewares.DataMiddleware())
-	router.Use(middlewares.LoggerToFile())
+	router.Use(middlewares.LoggerMiddleware())
 	// Define the API version group
 	v1 := router.Group("/api/v1")
 
