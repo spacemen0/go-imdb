@@ -39,6 +39,11 @@ func GetPerson(db *gorm.DB, id string, verbose bool) (*Person, error) {
 
 // UpdatePerson updates an existing person record in the database
 func UpdatePerson(db *gorm.DB, person *Person) error {
+	// Check if the person exists
+	var existingPerson Person
+	if err := db.First(&existingPerson, "nconst = ?", person.ID).Error; err != nil {
+		return err
+	}
 	if err := db.Model(&Person{}).Where("nconst = ?", person.ID).Updates(person).Error; err != nil {
 		return err
 	}

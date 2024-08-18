@@ -43,6 +43,10 @@ func GetTitle(db *gorm.DB, id string, verbose bool) (*Title, error) {
 
 // UpdateTitle updates an existing title record in the database
 func UpdateTitle(db *gorm.DB, title *Title) error {
+	var existingTitle Title
+	if err := db.First(&existingTitle, "nconst = ?", title.ID).Error; err != nil {
+		return err
+	}
 	if err := db.Model(&Title{}).Where("tconst = ?", title.ID).Updates(title).Error; err != nil {
 		return err
 	}
