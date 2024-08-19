@@ -64,10 +64,10 @@ func DeleteTitle(db *gorm.DB, id string) error {
 	return nil
 }
 
-func SearchTitles(db *gorm.DB, query string) ([]Title, error) {
+func SearchTitles(db *gorm.DB, query string, limit, offset int) ([]Title, error) {
 	var titles []Title
 	queryStr := "to_tsvector('english', primary_title || ' ' || original_title) @@ plainto_tsquery(?)"
-	if err := db.Where(queryStr, query).Preload("Actors").Find(&titles).Error; err != nil {
+	if err := db.Where(queryStr, query).Preload("Actors").Limit(limit).Offset(offset).Find(&titles).Error; err != nil {
 		return nil, err
 	}
 	return titles, nil
