@@ -26,15 +26,9 @@ func Search(c *gin.Context) {
 
 	switch searchType {
 	case "person":
-		var people []models.Person
-		queryStr := "to_tsvector('english', primary_name) @@ plainto_tsquery(?)"
-		err = db.Where(queryStr, query).Preload("KnownForTitles").Find(&people).Error
-		results = people
+		results, err = models.SearchPeople(db, query)
 	case "title":
-		var titles []models.Title
-		queryStr := "to_tsvector('english', primary_title || ' ' || original_title) @@ plainto_tsquery(?)"
-		err = db.Where(queryStr, query).Preload("Actors").Find(&titles).Error
-		results = titles
+		results, err = models.SearchTitles(db, query)
 	}
 
 	if err != nil {
