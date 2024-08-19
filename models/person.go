@@ -59,11 +59,15 @@ func DeletePerson(db *gorm.DB, id string) error {
 	return nil
 }
 
-func SearchPeople(db *gorm.DB, query string, limit, offset int) ([]Person, error) {
+func SearchPeople(db *gorm.DB, query string, limit, offset int) ([]Person, int64, error) {
 	var people []Person
+	var total int64
 	queryStr := "to_tsvector('english', primary_name) @@ plainto_tsquery(?)"
-	if err := db.Where(queryStr, query).Preload("KnownForTitles").Limit(limit).Offset(offset).Find(&people).Error; err != nil {
-		return nil, err
+	if err := db.Model(&Person{}).Where(queryStr, query).Count(&total).Error; err != nil {
+		return nil, 0, err
 	}
-	return people, nil
+	if err := db.Where(queryStr, query).Preload("KnownForTitles").Limit(limit).Offset(offset).Find(&people).Error; err != nil {
+		return nil, 0, err
+	}
+	return people, total, nil
 }
