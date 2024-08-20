@@ -13,30 +13,23 @@ import (
 func DataMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		if c.DefaultQuery("verbose", "false") == "true" {
-			// If verbose is true, do nothing and continue with the request
 			c.Next()
 			return
 		}
-		// Capture the response
 		w := utils.NewResponseWriter(c.Writer)
 		c.Writer = w
 
-		c.Next() // Process the request
+		c.Next()
 		if !strings.Contains(c.Writer.Header().Get("Content-Type"), "application/json") {
 			_, _ = w.ResponseWriter.Write(w.Body.Bytes())
 			return
 		}
-		// Only process JSON responses
-
-		// Decode the JSON
 		var data map[string]any
 		if err := json.Unmarshal(w.Body.Bytes(), &data); err != nil {
 			c.Writer.WriteHeader(http.StatusInternalServerError)
 			_, _ = c.Writer.Write([]byte(`{"error": "Failed to process response"}`))
 			return
 		}
-
-		// Process specific fields
 		if knownForTitles, ok := data["knownForTitles"].([]any); ok {
 			processPreloadedData(knownForTitles)
 			data["knownForTitles"] = knownForTitles
@@ -45,7 +38,6 @@ func DataMiddleware() gin.HandlerFunc {
 			processPreloadedData(actors)
 			data["actors"] = actors
 		}
-		// Encode the JSON back
 		newBody, err := json.Marshal(data)
 		if err != nil {
 			c.Writer.WriteHeader(http.StatusInternalServerError)
