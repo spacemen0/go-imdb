@@ -3,8 +3,10 @@ package helpers
 import (
 	"fmt"
 	"os"
+	"testing"
 
 	"gorm.io/driver/postgres"
+	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 	"spacemen0.github.com/models"
 )
@@ -12,26 +14,36 @@ import (
 var db *gorm.DB
 
 func InitDB() {
-	host := os.Getenv("DB_HOST")
-	user := os.Getenv("DB_USER")
-	password := os.Getenv("DB_PASSWORD")
-	dbname := os.Getenv("DB_NAME")
-	port := os.Getenv("DB_PORT")
-	sslmode := os.Getenv("SSL_MODE")
+	if testing.Testing() {
+		var err error
+		db, err = gorm.Open(sqlite.Open(":memory:"), &gorm.Config{})
+		if err != nil {
+			Log.Fatal("Failed to connect to in-memory database:", err)
+		}
+		err = db.AutoMigrate(&models.Title{}, &models.Person{})
+		if err != nil {
+			Log.Fatal("Failed to migrate database schema:", err)
+		}
+	} else {
+		host := os.Getenv("DB_HOST")
+		user := os.Getenv("DB_USER")
+		password := os.Getenv("DB_PASSWORD")
+		dbname := os.Getenv("DB_NAME")
+		port := os.Getenv("DB_PORT")
+		sslmode := os.Getenv("SSL_MODE")
 
-	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=%s", host, user, password, dbname, port, sslmode)
-	var err error
-	db, err = gorm.Open(postgres.Open(dsn), &gorm.Config{})
-	if err != nil {
-		Log.Fatal("Failed to connect to database:", err)
+		dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=%s", host, user, password, dbname, port, sslmode)
+		var err error
+		db, err = gorm.Open(postgres.Open(dsn), &gorm.Config{})
+		if err != nil {
+			Log.Fatal("Failed to connect to database:", err)
+		}
+		err = db.AutoMigrate(&models.Title{}, &models.Person{})
+		if err != nil {
+			Log.Fatal("Failed to migrate database schema:", err)
+		}
+		fullTextMigrations()
 	}
-
-	// Migrate the schema
-	err = db.AutoMigrate(&models.Title{}, &models.Person{})
-	if err != nil {
-		Log.Fatal("Failed to migrate database schema:", err)
-	}
-	fullTextMigrations()
 }
 
 func GetDB() *gorm.DB {
