@@ -57,12 +57,12 @@ func TestGetPerson(t *testing.T) {
 	helpers.InitDB() // Initialize the in-memory database
 
 	// First, create a person
-	db := helpers.GetDB()
+
 	person := &models.Person{
 		ID:          "nm00007",
 		PrimaryName: "Bob Smith",
 	}
-	err := db.Create(person).Error
+	err := helpers.DB.Create(person).Error
 	if err != nil {
 		t.Fatalf("Failed to create person: %v", err)
 	}

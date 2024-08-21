@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"spacemen0.github.com/controllers"
@@ -11,7 +12,7 @@ import (
 func main() {
 	// Initialize the database
 	helpers.InitLogger()
-	helpers.LoadEnv()
+	helpers.LoadConfig()
 	helpers.InitDB()
 	gin.SetMode(gin.ReleaseMode)
 	// Set up the Gin router
@@ -38,8 +39,9 @@ func main() {
 	v1.DELETE("/titles/:id", controllers.DeleteTitle)
 
 	// Start the server
-	helpers.Log.Println("Starting server on :8080...")
-	if err := router.Run(":8080"); err != nil {
+	serverAddress := fmt.Sprintf("%s:%d", helpers.AppConfig.Server.Host, helpers.AppConfig.Server.Port)
+	helpers.Log.Printf("Starting server on %s...\n", serverAddress)
+	if err := router.Run(serverAddress); err != nil {
 		helpers.Log.Fatalf("Failed to start server: %v", err)
 	}
 }

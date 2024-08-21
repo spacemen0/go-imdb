@@ -4,4 +4,4 @@ tmp
 misc
 *.log
 *.tsv
-.env
+*.yaml

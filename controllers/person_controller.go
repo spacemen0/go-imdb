@@ -19,8 +19,7 @@ func CreatePerson(c *gin.Context) {
 		return
 	}
 
-	db := helpers.GetDB()
-	if err := models.CreatePerson(db, &person); err != nil {
+	if err := models.CreatePerson(helpers.DB, &person); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create person", "details": err.Error()})
 		return
 	}
@@ -32,14 +31,13 @@ func CreatePerson(c *gin.Context) {
 func GetPerson(c *gin.Context) {
 	id := c.Param("id")
 	verbose := c.DefaultQuery("verbose", "false")
-	db := helpers.GetDB()
 	var person *models.Person
 	var err error
 
 	if verbose == "true" {
-		person, err = models.GetPerson(db, id, true)
+		person, err = models.GetPerson(helpers.DB, id, true)
 	} else {
-		person, err = models.GetPerson(db, id, false)
+		person, err = models.GetPerson(helpers.DB, id, false)
 	}
 
 	if err != nil {
@@ -64,8 +62,7 @@ func UpdatePerson(c *gin.Context) {
 	}
 
 	person.ID = id
-	db := helpers.GetDB()
-	if err := models.UpdatePerson(db, &person); err != nil {
+	if err := models.UpdatePerson(helpers.DB, &person); err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			c.JSON(http.StatusNotFound, gin.H{"error": "Person not found"})
 		} else {
@@ -80,8 +77,7 @@ func UpdatePerson(c *gin.Context) {
 // DeletePerson handles DELETE /persons/:id
 func DeletePerson(c *gin.Context) {
 	id := c.Param("id")
-	db := helpers.GetDB()
-	if err := models.DeletePerson(db, id); err != nil {
+	if err := models.DeletePerson(helpers.DB, id); err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			c.JSON(http.StatusNotFound, gin.H{"error": "Person not found"})
 		} else {

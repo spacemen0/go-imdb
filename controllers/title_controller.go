@@ -18,8 +18,7 @@ func CreateTitle(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid JSON data", "details": err.Error()})
 		return
 	}
-	db := helpers.GetDB()
-	if err := models.CreateTitle(db, &title); err != nil {
+	if err := models.CreateTitle(helpers.DB, &title); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create title", "details": err.Error()})
 		return
 	}
@@ -30,14 +29,14 @@ func CreateTitle(c *gin.Context) {
 func GetTitle(c *gin.Context) {
 	id := c.Param("id")
 	verbose := c.DefaultQuery("verbose", "false")
-	db := helpers.GetDB()
+
 	var title *models.Title
 	var err error
 
 	if verbose == "true" {
-		title, err = models.GetTitle(db, id, true)
+		title, err = models.GetTitle(helpers.DB, id, true)
 	} else {
-		title, err = models.GetTitle(db, id, false)
+		title, err = models.GetTitle(helpers.DB, id, false)
 	}
 
 	if err != nil {
@@ -62,8 +61,8 @@ func UpdateTitle(c *gin.Context) {
 	}
 
 	title.ID = id
-	db := helpers.GetDB()
-	if err := models.UpdateTitle(db, &title); err != nil {
+
+	if err := models.UpdateTitle(helpers.DB, &title); err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			c.JSON(http.StatusNotFound, gin.H{"error": "Title not found"})
 		} else {
@@ -78,8 +77,8 @@ func UpdateTitle(c *gin.Context) {
 // DeleteTitle handles DELETE /titles/:id
 func DeleteTitle(c *gin.Context) {
 	id := c.Param("id")
-	db := helpers.GetDB()
-	if err := models.DeleteTitle(db, id); err != nil {
+
+	if err := models.DeleteTitle(helpers.DB, id); err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			c.JSON(http.StatusNotFound, gin.H{"error": "Title not found"})
 		} else {

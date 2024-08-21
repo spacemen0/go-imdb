@@ -51,13 +51,13 @@ func TestGetTitle(t *testing.T) {
 	helpers.InitDB() // Initialize the in-memory database
 
 	// First, create a title
-	db := helpers.GetDB()
+
 	title := &models.Title{
 		ID:            "tt00002",
 		PrimaryTitle:  "Test Title",
 		OriginalTitle: "Test Original Title",
 	}
-	err := db.Create(title).Error
+	err := helpers.DB.Create(title).Error
 	if err != nil {
 		t.Fatalf("Failed to create title: %v", err)
 	}
@@ -82,13 +82,13 @@ func TestUpdateTitle(t *testing.T) {
 	helpers.InitDB() // Initialize the in-memory database
 
 	// First, create a title
-	db := helpers.GetDB()
+
 	title := &models.Title{
 		ID:            "tt00003",
 		PrimaryTitle:  "Old Title",
 		OriginalTitle: "Old Original Title",
 	}
-	err := db.Create(title).Error
+	err := helpers.DB.Create(title).Error
 	if err != nil {
 		t.Fatalf("Failed to create title: %v", err)
 	}
@@ -122,13 +122,13 @@ func TestDeleteTitle(t *testing.T) {
 	helpers.InitDB() // Initialize the in-memory database
 
 	// First, create a title
-	db := helpers.GetDB()
+
 	title := &models.Title{
 		ID:            "tt00004",
 		PrimaryTitle:  "Title to Delete",
 		OriginalTitle: "Original Title to Delete",
 	}
-	err := db.Create(title).Error
+	err := helpers.DB.Create(title).Error
 	if err != nil {
 		t.Fatalf("Failed to create title: %v", err)
 	}
@@ -144,7 +144,7 @@ func TestDeleteTitle(t *testing.T) {
 
 	// Verify the title was deleted
 	var deletedTitle models.Title
-	err = db.First(&deletedTitle, "tconst = ?", "tt00004").Error
+	err = helpers.DB.First(&deletedTitle, "tconst = ?", "tt00004").Error
 	assert.Error(t, err) // Expect an error since the title should be deleted
 	assert.True(t, errors.Is(err, gorm.ErrRecordNotFound))
 }

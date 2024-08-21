@@ -23,15 +23,14 @@ func Search(c *gin.Context) {
 		return
 	}
 	offset := (page - 1) * limit
-	db := helpers.GetDB()
 	var results any
 	var total int64
 	var err error
 	switch searchType {
 	case "person":
-		results, total, err = models.SearchPeople(db, query, limit, offset)
+		results, total, err = models.SearchPeople(helpers.DB, query, limit, offset)
 	case "title":
-		results, total, err = models.SearchTitles(db, query, limit, offset)
+		results, total, err = models.SearchTitles(helpers.DB, query, limit, offset)
 	}
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to perform search"})
