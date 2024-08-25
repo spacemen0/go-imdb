@@ -11,8 +11,8 @@ import (
 
 func main() {
 	// Initialize the database
-	helpers.InitLogger()
-	helpers.LoadConfig()
+	helpers.InitLogger("server.log")
+	helpers.LoadConfig("config.yaml")
 	helpers.InitDB()
 	gin.SetMode(gin.ReleaseMode)
 	// Set up the Gin router

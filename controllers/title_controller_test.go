@@ -15,9 +15,8 @@ import (
 )
 
 func TestCreateTitle(t *testing.T) {
-	helpers.InitDB() // Initialize the in-memory database
 
-	router := setupRouter()
+	router := beforeTesting()
 
 	// Define a new title
 	title := &models.Title{
@@ -45,12 +44,11 @@ func TestCreateTitle(t *testing.T) {
 	err := json.Unmarshal(resp.Body.Bytes(), &createdTitle)
 	assert.NoError(t, err)
 	assert.Equal(t, "Example Title", createdTitle.PrimaryTitle)
+	afterTesting()
 }
 
 func TestGetTitle(t *testing.T) {
-	helpers.InitDB() // Initialize the in-memory database
-
-	// First, create a title
+	router := beforeTesting()
 
 	title := &models.Title{
 		ID:            "tt00002",
@@ -62,8 +60,6 @@ func TestGetTitle(t *testing.T) {
 		t.Fatalf("Failed to create title: %v", err)
 	}
 
-	// Test GET /titles/:id
-	router := setupRouter()
 	req, _ := http.NewRequest(http.MethodGet, "/titles/tt00002", nil)
 	resp := httptest.NewRecorder()
 	router.ServeHTTP(resp, req)
@@ -76,13 +72,12 @@ func TestGetTitle(t *testing.T) {
 	err = json.Unmarshal(resp.Body.Bytes(), &retrievedTitle)
 	assert.NoError(t, err)
 	assert.Equal(t, "Test Title", retrievedTitle.PrimaryTitle)
+	afterTesting()
 }
 
 func TestUpdateTitle(t *testing.T) {
-	helpers.InitDB() // Initialize the in-memory database
 
-	// First, create a title
-
+	router := beforeTesting()
 	title := &models.Title{
 		ID:            "tt00003",
 		PrimaryTitle:  "Old Title",
@@ -105,7 +100,7 @@ func TestUpdateTitle(t *testing.T) {
 	req.Header.Set("Content-Type", "application/json")
 
 	resp := httptest.NewRecorder()
-	router := setupRouter()
+
 	router.ServeHTTP(resp, req)
 
 	// Assert the response status
@@ -116,10 +111,11 @@ func TestUpdateTitle(t *testing.T) {
 	err = json.Unmarshal(resp.Body.Bytes(), &retrievedTitle)
 	assert.NoError(t, err)
 	assert.Equal(t, "Updated Title", retrievedTitle.PrimaryTitle)
+	afterTesting()
 }
 
 func TestDeleteTitle(t *testing.T) {
-	helpers.InitDB() // Initialize the in-memory database
+	router := beforeTesting() // Initialize the in-memory database
 
 	// First, create a title
 
@@ -136,7 +132,7 @@ func TestDeleteTitle(t *testing.T) {
 	// Test DELETE /titles/:id
 	req, _ := http.NewRequest(http.MethodDelete, "/titles/tt00004", nil)
 	resp := httptest.NewRecorder()
-	router := setupRouter()
+
 	router.ServeHTTP(resp, req)
 
 	// Assert the response status
@@ -147,4 +143,5 @@ func TestDeleteTitle(t *testing.T) {
 	err = helpers.DB.First(&deletedTitle, "tconst = ?", "tt00004").Error
 	assert.Error(t, err) // Expect an error since the title should be deleted
 	assert.True(t, errors.Is(err, gorm.ErrRecordNotFound))
+	afterTesting()
 }

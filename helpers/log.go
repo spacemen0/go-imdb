@@ -7,9 +7,9 @@ import (
 
 var Log *log.Logger
 
-func InitLogger() {
+func InitLogger(path string) {
 	// Open the log file
-	f, err := os.OpenFile("./server.log", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+	f, err := os.OpenFile(path, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 	if err != nil {
 		panic(err)
 	}

@@ -7,12 +7,13 @@ import (
 
 type Config struct {
 	Database struct {
-		Host     string `yaml:"host"`
-		User     string `yaml:"user"`
-		Password string `yaml:"password"`
-		Name     string `yaml:"name"`
-		Port     int    `yaml:"port"`
-		SSLMode  string `yaml:"ssl_mode"`
+		Host       string `yaml:"host"`
+		User       string `yaml:"user"`
+		Password   string `yaml:"password"`
+		Name       string `yaml:"name"`
+		TestDBName string `yaml:"test_db_name"`
+		Port       int    `yaml:"port"`
+		SSLMode    string `yaml:"ssl_mode"`
 	} `yaml:"database"`
 	Server struct {
 		Host string `yaml:"host"`
@@ -22,9 +23,9 @@ type Config struct {
 
 var AppConfig Config
 
-func LoadConfig() {
+func LoadConfig(path string) {
 	// Open the YAML configuration file
-	file, err := os.Open("config.yaml")
+	file, err := os.Open(path)
 	if err != nil {
 		Log.Fatalf("Error opening config.yaml file: %v", err)
 	}
